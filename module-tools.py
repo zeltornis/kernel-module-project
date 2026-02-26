@@ -7,10 +7,10 @@ def run_cmd(cmd):
     subprocess.run(cmd, shell=True, check=True)
 
 def load_module(module_path):
-    run_cmd(f"sudo insmod {module_path}")
+    run_cmd(f"insmod {module_path}")
 
 def unload_module(module_name):
-    run_cmd(f"sudo rmmod {module_name}")
+    run_cmd(f"rmmod {module_name}")
 
 def show_logs():
     run_cmd("dmesg | tail -n 20")
@@ -29,6 +29,8 @@ parser.add_argument("command",
                     choices=["load", "unload", "logs", "monitor"])
 parser.add_argument("--module",
                     help="Path to module (.ko) or module name")
+parser.add_argument("--keyword",
+                    help="Keyword for filtering dmesg events")
 
 args = parser.parse_args()
 
@@ -45,4 +47,7 @@ elif args.command == "unload":
 elif args.command == "logs":
     show_logs()
 elif args.command == "monitor":
-    monitor_logs()
+    if not args.keyword:
+        print("Error: --module is required for load")
+    else:
+        monitor_logs(args.keyword)
